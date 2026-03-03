@@ -6,6 +6,14 @@ The format is based on Keep a Changelog and the project follows Semantic Version
 
 ## [Unreleased]
 
+## [0.1.6]
+
+### Changed
+
+- Running `bpx` with no arguments now prints root help and exits with status code `0` (instead of non-zero).
+- BPX CLI and plugin version strings updated to `0.1.6`.
+- Skill guidance now explicitly recommends `--format toml` for AI-driven post-processing.
+
 ## [0.1.5]
 
 ### Changed
