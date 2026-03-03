@@ -151,6 +151,21 @@ func TestRunScanSummaryAliasIsRejected(t *testing.T) {
 	}
 }
 
+func TestRunNoArgsShowsUsageAndSucceeds(t *testing.T) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := Run([]string{}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("exit code: got %d want 0", code)
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("unexpected stderr: %s", stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "bpx help [command]") {
+		t.Fatalf("expected root usage on stdout, got: %s", stdout.String())
+	}
+}
+
 func TestRunVersionPrintsSemanticVersion(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -161,7 +176,7 @@ func TestRunVersionPrintsSemanticVersion(t *testing.T) {
 	if stderr.Len() != 0 {
 		t.Fatalf("unexpected stderr: %s", stderr.String())
 	}
-	if got, want := strings.TrimSpace(stdout.String()), "0.1.5"; got != want {
+	if got, want := strings.TrimSpace(stdout.String()), "0.1.6"; got != want {
 		t.Fatalf("version: got %q want %q", got, want)
 	}
 }
@@ -176,7 +191,7 @@ func TestRunVersionAliasPrintsSemanticVersion(t *testing.T) {
 	if stderr.Len() != 0 {
 		t.Fatalf("unexpected stderr: %s", stderr.String())
 	}
-	if got, want := strings.TrimSpace(stdout.String()), "0.1.5"; got != want {
+	if got, want := strings.TrimSpace(stdout.String()), "0.1.6"; got != want {
 		t.Fatalf("version alias: got %q want %q", got, want)
 	}
 }

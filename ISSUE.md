@@ -1,6 +1,6 @@
 # Issue Guide
 
-Thanks for opening an Issue for `bpx`.
+Thanks for opening an issue for `bpx`.
 
 ## Before Creating an Issue
 
@@ -9,6 +9,8 @@ Thanks for opening an Issue for `bpx`.
 - For security vulnerabilities, do not open a public Issue. Use private reporting in [SECURITY.md](SECURITY.md).
 
 ## Issue Types
+
+Please choose the matching GitHub issue template when creating a new issue.
 
 ### Bug Report
 
@@ -21,6 +23,7 @@ Please include:
 5. Actual behavior
 6. Minimal reproduction asset/setup (if shareable)
 7. Logs or error output
+8. Optional but recommended: attach both `.uasset` files from before and after the `bpx` operation
 
 ### Feature Request
 

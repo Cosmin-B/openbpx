@@ -18,7 +18,7 @@ import (
 const (
 	structuredOutputFormatJSON = "json"
 	structuredOutputFormatTOML = "toml"
-	defaultToolVersion         = "0.1.5"
+	defaultToolVersion         = "0.1.6"
 )
 
 var currentStructuredOutputFormat = structuredOutputFormatJSON
@@ -133,8 +133,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 	defer setStructuredOutputFormat(prevFormat)
 
 	if len(args) == 0 {
-		printRootUsage(stderr)
-		return 1
+		printRootUsage(stdout)
+		return 0
 	}
 	if len(args) == 2 && isHelpToken(args[1]) {
 		return runHelp(args[:1], stdout, stderr)

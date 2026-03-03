@@ -14,7 +14,7 @@ BPX runs on **Windows**, **macOS**, and **Linux**.
 ## Project Status
 
 - Phase: **Alpha**
-- Current CLI version: **0.1.5**
+- Current CLI version: **0.1.6**
 - Supported UE window: **UE 5.0 to UE 5.6** (`FileVersionUE5=1000..1017`)
 - Supported platforms: **Windows / macOS / Linux** (`amd64`, `arm64`)
 - Core principles: **unknown-byte preservation**, **round-trip fidelity**, **safety-first editing**, **UE behavior-grounded implementation**
@@ -30,7 +30,7 @@ BPX runs on **Windows**, **macOS**, and **Linux**.
 brew install --formula https://raw.githubusercontent.com/wilddogjp/openbpx/main/packaging/homebrew/openbpx.rb
 
 # Debian / Ubuntu (dpkg from GitHub Releases)
-VER=0.1.5 && ARCH="$(dpkg --print-architecture)" && curl -fsSL -o "/tmp/openbpx_${VER}_${ARCH}.deb" "https://github.com/wilddogjp/openbpx/releases/download/v${VER}/openbpx_${VER}_${ARCH}.deb" && sudo dpkg -i "/tmp/openbpx_${VER}_${ARCH}.deb"
+VER=0.1.6 && ARCH="$(dpkg --print-architecture)" && curl -fsSL -o "/tmp/openbpx_${VER}_${ARCH}.deb" "https://github.com/wilddogjp/openbpx/releases/download/v${VER}/openbpx_${VER}_${ARCH}.deb" && sudo dpkg -i "/tmp/openbpx_${VER}_${ARCH}.deb"
 
 # Windows
 winget install --id WilddogJP.OpenBPX --exact

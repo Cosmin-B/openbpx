@@ -11,12 +11,16 @@ description: Use this skill when a user asks to inspect, validate, diff, or safe
 - Assume `bpx` is available on `PATH`.
 - If `bpx` is not installed, use one of these commands:
   - macOS: `brew install --formula https://raw.githubusercontent.com/wilddogjp/openbpx/main/packaging/homebrew/openbpx.rb`
-  - Debian/Ubuntu: `VER=0.1.5; ARCH="$(dpkg --print-architecture)"; curl -fsSLO "https://github.com/wilddogjp/openbpx/releases/download/v${VER}/openbpx_${VER}_${ARCH}.deb"; sudo dpkg -i "openbpx_${VER}_${ARCH}.deb"`
+  - Debian/Ubuntu: `VER=0.1.6; ARCH="$(dpkg --print-architecture)"; curl -fsSLO "https://github.com/wilddogjp/openbpx/releases/download/v${VER}/openbpx_${VER}_${ARCH}.deb"; sudo dpkg -i "openbpx_${VER}_${ARCH}.deb"`
   - Windows: `winget install --id WilddogJP.OpenBPX --exact`
 
 ## Purpose
 
 Use implemented BPX commands safely for UE 5.x assets, with round-trip safety and predictable output.
+
+## Output Format
+
+- For AI post-processing, prefer `--format toml` unless JSON/CSV/TSV is explicitly required.
 
 ## Safety Guardrails
 
