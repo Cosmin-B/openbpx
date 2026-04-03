@@ -181,10 +181,14 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		return runStringTable(args[1:], stdout, stderr)
 	case "class":
 		return runClass(args[1:], stdout, stderr)
+	case "controlrig":
+		return runControlRig(args[1:], stdout, stderr)
 	case "level":
 		return runLevel(args[1:], stdout, stderr)
 	case "material":
 		return runMaterial(args[1:], stdout, stderr)
+	case "niagara":
+		return runNiagara(args[1:], stdout, stderr)
 	case "raw":
 		return runRaw(args[1:], stdout, stderr)
 	case "metadata":
@@ -861,6 +865,7 @@ func helpCatalog() []helpCategory {
 				"bpx localization resolve <file.uasset> [--export <n>] --culture <culture> [--locres <path>] [--missing-only]",
 				"bpx datatable read <file.uasset> [--export <n>] [--row <name>] [--format json|toml|csv|tsv] [--out path]",
 				"bpx blueprint info <file.uasset> [--export <n>]",
+				"bpx blueprint anim-info <file.uasset> [--include-properties]",
 				"bpx blueprint bytecode <file.uasset> --export <n> [--range-source auto|export-map|ustruct-script|serial-full] [--strict-range] [--diagnostics]",
 				"bpx blueprint disasm <file.uasset> --export <n> [--format json|toml|text] [--analysis] [--entrypoint <vm>] [--max-steps <n>] [--range-source auto|export-map|ustruct-script|serial-full] [--strict-range] [--diagnostics]",
 				"bpx blueprint trace <file.uasset> --from <Node|Node.Pin> [--to-node <token>] [--to-function <token>] [--max-depth <n>]",
@@ -874,10 +879,12 @@ func helpCatalog() []helpCategory {
 				"bpx struct details <file.uasset> --export <n>",
 				"bpx stringtable read <file.uasset>",
 				"bpx class <file.uasset> --export <n>",
+				"bpx controlrig read <file.uasset> [--include-properties]",
 				"bpx level info <file.umap> --export <n>",
 				"bpx level actor-search <file.umap> [--name <token>] [--actor-label <token>] [--actor-class <token>] [--limit <n>]",
 				"bpx level var-list <file.umap> --actor <name|PersistentLevel.Name|export-index>",
 				"bpx material read <file.uasset> [--export <n>] [--include-hlsl] [--children-root <directory>] [--parent <token>] [--pattern \"*.uasset\"] [--recursive] [--limit <n>]",
+				"bpx niagara read <file.uasset> [--export <n>] [--include-properties]",
 				"bpx raw <file.uasset> --export <n>",
 				"bpx metadata <file.uasset> --export <n>",
 				"bpx validate <file.uasset> [--binary-equality]",
@@ -986,10 +993,14 @@ func helpTopicSummary(topic string) string {
 		return "Read and edit StringTable entries and namespace."
 	case "class":
 		return "Inspect one class export payload/header by index."
+	case "controlrig":
+		return "Inspect ControlRig blueprints, graphs, VM model references, and graph-node structure."
 	case "level":
 		return "Inspect level exports and read/write actor properties in .umap."
 	case "material":
 		return "Inspect materials, scan child instances, and extract custom HLSL."
+	case "niagara":
+		return "Inspect Niagara systems, emitters, graphs, scripts, renderers, and data interfaces."
 	case "raw":
 		return "Read one export serial payload as base64."
 	case "metadata":
@@ -1118,6 +1129,7 @@ func helpTopicBehaviorLines(topic string) []string {
 	case "blueprint":
 		return []string{
 			"`info`: summarizes blueprint/function exports.",
+			"`anim-info`: summarizes AnimBlueprint graph exports, generated anim structs, and CDO anim node properties.",
 			"`bytecode`: extracts selected bytecode range as base64.",
 			"`disasm`: disassembles bytecode (json|toml|text, optional analysis).",
 			"`trace`: traces an execution path between nodes.",
@@ -1152,6 +1164,12 @@ func helpTopicBehaviorLines(topic string) []string {
 			"Inspects one class export payload/header by --export index.",
 			"Output follows generic export info shape (`file`, `export`).",
 		}
+	case "controlrig":
+		return []string{
+			"`read`: summarizes ControlRigBlueprint exports, generated classes, ControlRigGraph exports, and RigVM/graph-node counts.",
+			"`read --include-properties` appends decoded property payloads for the blueprint and graph summaries.",
+			"The payload is intended to explain rig structure and graph organization rather than dump every graph node export.",
+		}
 	case "level":
 		return []string{
 			"`info`: inspects one level export.",
@@ -1166,6 +1184,13 @@ func helpTopicBehaviorLines(topic string) []string {
 			"`inspect`: summarizes material inputs, asset references, and direct parent material.",
 			"`children`: scans a directory for material instances matching --parent token.",
 			"`hlsl`: shows custom-node HLSL snippets (`UMaterialExpressionCustom::Code`) and explains full-translation limits.",
+		}
+	case "niagara":
+		return []string{
+			"`read`: summarizes NiagaraSystem composition, emitter handles, scripts, renderers, graphs, data interfaces, and script variables.",
+			"`read --export` targets one NiagaraSystem export when the package contains multiple systems.",
+			"`read --include-properties` appends decoded property payloads for the summarized Niagara exports.",
+			"The payload is intended to explain how a Niagara package is assembled rather than dump every export blindly.",
 		}
 	case "raw":
 		return []string{
