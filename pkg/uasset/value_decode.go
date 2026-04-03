@@ -1631,7 +1631,7 @@ func (a *Asset) decodeKnownStructFromReader(r *byteReader, structType string) (a
 
 func isLikelyTaggedAssetStructType(structType string) bool {
 	low := strings.ToLower(structType)
-	return strings.Contains(low, "(/game/") || strings.Contains(low, "(/engine/")
+	return strings.Contains(low, "(/game/") || strings.Contains(low, "(/engine/") || strings.Contains(low, "(/script/")
 }
 
 func isKnownTaggedStructDecodeCandidate(structTypeLower string) bool {
@@ -1794,7 +1794,7 @@ func decodeStructTypeName(node *decodeTypeNode) string {
 		return base
 	}
 	firstArg := strings.ToLower(strings.TrimSpace(structNode.Children[0].Name))
-	if strings.HasPrefix(firstArg, "/game/") || strings.HasPrefix(firstArg, "/engine/") {
+	if strings.HasPrefix(firstArg, "/game/") || strings.HasPrefix(firstArg, "/engine/") || strings.HasPrefix(firstArg, "/script/") {
 		full := strings.TrimSpace(renderDecodeTypeNode(structNode))
 		if full != "" {
 			return full

@@ -807,6 +807,82 @@ func TestDecodePropertyValueArrayUserDefinedStructTagged(t *testing.T) {
 	}
 }
 
+func TestDecodePropertyValueArrayScriptDefinedStructTagged(t *testing.T) {
+	names := []NameEntry{
+		{Value: "None"},
+		{Value: "ArrayProperty"},
+		{Value: "StructProperty"},
+		{Value: "CustomScriptStruct"},
+		{Value: "/Script/TestModule"},
+		{Value: "ReferencedObject"},
+		{Value: "ObjectProperty"},
+		{Value: "ReferencedValue"},
+		{Value: "IntProperty"},
+		{Value: "ReferencedObjectAsset"},
+	}
+
+	element := make([]byte, 0, 96)
+	element = append(element, encodeTaggedProperty(5, [][2]int32{{6, 0}}, 4, 0, encodeInt32(-1))...)
+	element = append(element, encodeTaggedProperty(7, [][2]int32{{8, 0}}, 4, 0, encodeInt32(123))...)
+	element = append(element, encodeNameRef(0, 0)...)
+
+	raw := make([]byte, 0, 4+len(element))
+	raw = append(raw, encodeInt32(1)...)
+	raw = append(raw, element...)
+
+	asset := &Asset{
+		Raw:   RawAsset{Bytes: raw},
+		Names: names,
+		Imports: []ImportEntry{
+			{
+				ObjectName:  NameRef{Index: 9},
+				ClassName:   NameRef{Index: 6},
+				PackageName: NameRef{Index: 4},
+			},
+		},
+		Summary: PackageSummary{
+			FileVersionUE5: 1017,
+		},
+	}
+	tag := PropertyTag{
+		TypeNodes: []PropertyTypeNode{
+			{Name: NameRef{Index: 1}, InnerCount: 1},
+			{Name: NameRef{Index: 2}, InnerCount: 1},
+			{Name: NameRef{Index: 3}, InnerCount: 1},
+			{Name: NameRef{Index: 4}, InnerCount: 0},
+		},
+		Size:        int32(len(raw)),
+		ValueOffset: 0,
+	}
+
+	val, ok := asset.DecodePropertyValue(tag)
+	if !ok {
+		t.Fatalf("expected script-defined struct array decode")
+	}
+	out := val.(map[string]any)
+	if containsRawBase64(out) {
+		t.Fatalf("expected no rawBase64 fallback for script-defined struct")
+	}
+	items := out["value"].([]any)
+	if len(items) != 1 {
+		t.Fatalf("array len: got %d", len(items))
+	}
+	structValue := items[0].(map[string]any)["value"].(map[string]any)
+	if got := structValue["structType"]; got != "CustomScriptStruct(/Script/TestModule)" {
+		t.Fatalf("structType: got %v", got)
+	}
+	fields := structValue["value"].(map[string]any)
+	referencedObject := fields["ReferencedObject"].(map[string]any)
+	objectValue := referencedObject["value"].(map[string]any)
+	if got, want := objectValue["resolved"], "import:1:ReferencedObjectAsset"; got != want {
+		t.Fatalf("ReferencedObject resolved: got %v want %v", got, want)
+	}
+	params := fields["ReferencedValue"].(map[string]any)
+	if got, want := params["value"], int32(123); got != want {
+		t.Fatalf("ReferencedValue value: got %v want %v", got, want)
+	}
+}
+
 func TestDecodePropertyValueArrayLevelViewportInfo(t *testing.T) {
 	names := []NameEntry{
 		{Value: "None"},
