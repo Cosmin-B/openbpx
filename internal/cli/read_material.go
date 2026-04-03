@@ -358,21 +358,84 @@ func buildMaterialInspectEntry(asset *uasset.Asset, exportIndex int) map[string]
 	}
 
 	refs := materialCollectReferencesFromProperties(asset, props.Properties)
+	expressionSummary := materialExpressionSummary(asset, exportIndex)
 	entry := map[string]any{
 		"export":              exportIndex + 1,
 		"objectName":          exp.ObjectName.Display(asset.Names),
 		"className":           asset.ResolveClassName(exp),
 		"parent":              materialParentFromProperties(asset, props.Properties),
+		"editorOnlyData":      decodeObjectReference(decodedPropertyMap(asset, props.Properties)["EditorOnlyData"]),
 		"parameterGroups":     parameterGroups,
 		"parameterGroupCount": len(parameterGroups),
 		"parameterCount":      parameterCount,
 		"assetReferenceCount": len(refs),
 		"assetReferences":     refs,
+		"expressionSummary":   expressionSummary,
 	}
 	if len(props.Warnings) > 0 {
 		entry["warnings"] = append([]string(nil), props.Warnings...)
 	}
 	return entry
+}
+
+func materialExpressionSummary(asset *uasset.Asset, materialExportIndex int) map[string]any {
+	if asset == nil || materialExportIndex < 0 || materialExportIndex >= len(asset.Exports) {
+		return nil
+	}
+	outerExport := materialExportIndex + 1
+	total := 0
+	classCounts := map[string]int{}
+	functionCalls := make([]map[string]any, 0, 16)
+
+	for idx, exp := range asset.Exports {
+		if int(exp.OuterIndex) != outerExport {
+			continue
+		}
+		className := asset.ResolveClassName(exp)
+		if !strings.HasPrefix(strings.ToLower(className), "materialexpression") {
+			continue
+		}
+		total++
+		classCounts[className]++
+		if strings.EqualFold(className, "MaterialExpressionMaterialFunctionCall") {
+			props := asset.ParseExportProperties(idx)
+			propMap := decodedPropertyMap(asset, props.Properties)
+			functionCalls = append(functionCalls, map[string]any{
+				"export":     idx + 1,
+				"objectName": exp.ObjectName.Display(asset.Names),
+				"function":   decodeObjectReference(propMap["MaterialFunction"]),
+			})
+		}
+	}
+
+	out := map[string]any{
+		"expressionCount": total,
+		"classCounts":     topCountsFromIntMap(classCounts),
+		"functionCalls":   functionCalls,
+	}
+	return out
+}
+
+func topCountsFromIntMap(counts map[string]int) []map[string]any {
+	type kv struct {
+		Key   string
+		Count int
+	}
+	rows := make([]kv, 0, len(counts))
+	for key, count := range counts {
+		rows = append(rows, kv{Key: key, Count: count})
+	}
+	sort.Slice(rows, func(i, j int) bool {
+		if rows[i].Count == rows[j].Count {
+			return rows[i].Key < rows[j].Key
+		}
+		return rows[i].Count > rows[j].Count
+	})
+	out := make([]map[string]any, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, map[string]any{"key": row.Key, "count": row.Count})
+	}
+	return out
 }
 
 func buildMaterialCustomExpressionEntry(asset *uasset.Asset, exportIndex, ownerIndex int, ownerOK bool) map[string]any {

@@ -35,6 +35,7 @@ These are read/validate commands (implemented plus planned additions).
 | Package | `bpx package depends <file.uasset> [--reverse]` | ✅ Implemented | DependsMap listing (`--reverse` adds reverse dependency view) |
 | Package | `bpx package resolve-index <file.uasset> --index <i>` | ✅ Implemented | `FPackageIndex` resolution |
 | Package | `bpx package section <file.uasset> --name <section>` | ✅ Implemented | Includes `soft-object-paths`, `import-type-hierarchies`, and other raw sections |
+| PCG | `bpx pcg read <file.uasset> [--export <n>] [--include-properties]` | ✅ Implemented | Summarizes PCG graph/node/settings/pin/edge composition |
 | Localization | `bpx localization read <file.uasset> [--export <n>] [--include-history] [--format json\|toml\|csv]` | ✅ Implemented | Lists TextProperty + GatherableTextData (`--export` excludes GatherableTextData) |
 | Localization | `bpx localization query <file.uasset> [--export <n>] [--namespace <ns>] [--key <key>] [--text <token>] [--history-type <type>] [--limit <n>]` | ✅ Implemented | Filters by namespace/key/historyType/etc. |
 | Localization | `bpx localization resolve <file.uasset> [--export <n>] --culture <culture> [--locres <path>] [--missing-only]` | ✅ Implemented | Preview resolved display strings via `.locres` |
@@ -57,7 +58,7 @@ These are read/validate commands (implemented plus planned additions).
 | Level | `bpx level info <file.umap> --export <n>` | ✅ Implemented | LevelExport read |
 | Level | `bpx level actor-search <file.umap> [--name <token>] [--actor-label <token>] [--actor-class <token>] [--limit <n>]` | ✅ Implemented | Searches `PersistentLevel` child exports by actor name/label/class tokens |
 | Level | `bpx level var-list <file.umap> --actor <name\|PersistentLevel.Name\|export-index>` | ✅ Implemented | Resolves placed objects via `OuterIndex -> PersistentLevel` and returns decoded variables |
-| Material | `bpx material read <file.uasset> [--export <n>] [--include-hlsl] [--children-root <directory>] [--parent <token>] [--pattern "*.uasset"] [--recursive] [--limit <n>]` | ✅ Implemented | Unified material read entry (inputs/refs/parent + optional children scan + HLSL summary) |
+| Material | `bpx material read <file.uasset> [--export <n>] [--include-hlsl] [--children-root <directory>] [--parent <token>] [--pattern "*.uasset"] [--recursive] [--limit <n>]` | ✅ Implemented | Unified material read entry (inputs/refs/parent + optional children scan + HLSL summary + expression graph counts) |
 | Niagara | `bpx niagara read <file.uasset> [--export <n>] [--include-properties]` | ✅ Implemented | Summarizes Niagara system composition, emitters, scripts, graphs, renderers, and data interfaces |
 | Raw Export | `bpx raw <file.uasset> --export <n>` | ✅ Implemented | Raw payload base64 |
 | Metadata | `bpx metadata <file.uasset> --export <n>` | ✅ Implemented | MetaDataExport read |

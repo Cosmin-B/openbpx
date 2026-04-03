@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/wilddogjp/openbpx/pkg/uasset"
 )
 
 func TestRunMaterialReadAggregatesInspectAndHLSL(t *testing.T) {
@@ -121,5 +123,41 @@ func TestRunMaterialLegacySubcommandsAreRejected(t *testing.T) {
 		if !strings.Contains(stderr.String(), "unknown material command") {
 			t.Fatalf("argv=%v expected unknown material command, got: %s", argv, stderr.String())
 		}
+	}
+}
+
+func TestMaterialExpressionSummaryCountsChildExpressions(t *testing.T) {
+	names := []uasset.NameEntry{
+		{Value: "None"},
+		{Value: "Material"},
+		{Value: "MaterialExpressionAdd"},
+		{Value: "MaterialExpressionMaterialFunctionCall"},
+		{Value: "M_Test"},
+		{Value: "Expr_Add"},
+		{Value: "Expr_Call"},
+		{Value: "FunctionAsset"},
+	}
+	asset := &uasset.Asset{
+		Names: names,
+		Imports: []uasset.ImportEntry{
+			{ObjectName: uasset.NameRef{Index: 1}},
+			{ObjectName: uasset.NameRef{Index: 2}},
+			{ObjectName: uasset.NameRef{Index: 3}},
+			{ObjectName: uasset.NameRef{Index: 7}},
+		},
+		Exports: []uasset.ExportEntry{
+			{ClassIndex: -1, ObjectName: uasset.NameRef{Index: 4}},
+			{ClassIndex: -2, ObjectName: uasset.NameRef{Index: 5}, OuterIndex: 1},
+			{ClassIndex: -3, ObjectName: uasset.NameRef{Index: 6}, OuterIndex: 1},
+		},
+	}
+
+	summary := materialExpressionSummary(asset, 0)
+	if got, want := summary["expressionCount"], 2; got != want {
+		t.Fatalf("expressionCount: got %v want %v", got, want)
+	}
+	classCounts := summary["classCounts"].([]map[string]any)
+	if len(classCounts) != 2 {
+		t.Fatalf("classCounts len: got %d", len(classCounts))
 	}
 }

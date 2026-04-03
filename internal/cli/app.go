@@ -165,6 +165,8 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		return runRef(args[1:], stdout, stderr)
 	case "package":
 		return runPackage(args[1:], stdout, stderr)
+	case "pcg":
+		return runPCG(args[1:], stdout, stderr)
 	case "localization":
 		return runLocalization(args[1:], stdout, stderr)
 	case "datatable":
@@ -860,6 +862,7 @@ func helpCatalog() []helpCategory {
 				"bpx package depends <file.uasset> [--reverse]",
 				"bpx package resolve-index <file.uasset> --index <i>",
 				"bpx package section <file.uasset> --name <section>",
+				"bpx pcg read <file.uasset> [--export <n>] [--include-properties]",
 				"bpx localization read <file.uasset> [--export <n>] [--include-history] [--format json|toml|csv]",
 				"bpx localization query <file.uasset> [--export <n>] [--namespace <ns>] [--key <key>] [--text <token>] [--history-type <type>] [--limit <n>]",
 				"bpx localization resolve <file.uasset> [--export <n>] --culture <culture> [--locres <path>] [--missing-only]",
@@ -979,6 +982,8 @@ func helpTopicSummary(topic string) string {
 		return "Inspect and edit NameMap entries with UE5-compatible hashes."
 	case "package":
 		return "Inspect package metadata/sections or update package flags."
+	case "pcg":
+		return "Inspect PCG graphs, nodes, settings, pins, edges, and related data exports."
 	case "localization":
 		return "Read/query/resolve localization data and edit existing text identities."
 	case "datatable":
@@ -998,7 +1003,7 @@ func helpTopicSummary(topic string) string {
 	case "level":
 		return "Inspect level exports and read/write actor properties in .umap."
 	case "material":
-		return "Inspect materials, scan child instances, and extract custom HLSL."
+		return "Inspect materials, expression graphs, child instances, and custom HLSL."
 	case "niagara":
 		return "Inspect Niagara systems, emitters, graphs, scripts, renderers, and data interfaces."
 	case "raw":
@@ -1109,6 +1114,12 @@ func helpTopicBehaviorLines(topic string) []string {
 			"`set-flags`: rewrites package flags within supported safe scope.",
 			"`set-flags` blocks `PKG_FilterEditorOnly` and `PKG_UnversionedProperties` toggles.",
 		}
+	case "pcg":
+		return []string{
+			"`read`: summarizes PCGGraph composition, PCGNode exports, settings references, pins, edges, and data-side exports.",
+			"`read --export` targets one PCGGraph export when a package contains multiple graphs.",
+			"`read --include-properties` appends decoded property payloads for the summarized PCG exports.",
+		}
 	case "localization":
 		return []string{
 			"`read`: enumerates TextProperty + GatherableTextData entries.",
@@ -1181,7 +1192,7 @@ func helpTopicBehaviorLines(topic string) []string {
 	case "material":
 		return []string{
 			"`read`: unified read entry for material inputs/references/parent and optional child scan/HLSL summary.",
-			"`inspect`: summarizes material inputs, asset references, and direct parent material.",
+			"`inspect`: summarizes material inputs, asset references, direct parent material, and expression graph coverage.",
 			"`children`: scans a directory for material instances matching --parent token.",
 			"`hlsl`: shows custom-node HLSL snippets (`UMaterialExpressionCustom::Code`) and explains full-translation limits.",
 		}
