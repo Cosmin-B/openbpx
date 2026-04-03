@@ -40,6 +40,7 @@ These are read/validate commands (implemented plus planned additions).
 | Localization | `bpx localization resolve <file.uasset> [--export <n>] --culture <culture> [--locres <path>] [--missing-only]` | ✅ Implemented | Preview resolved display strings via `.locres` |
 | DataTable | `bpx datatable read <file.uasset> [--export <n>] [--row <name>] [--format json\|toml\|csv\|tsv] [--out path]` | ✅ Implemented | Reads all rows by default; `--row` filters; `CompositeDataTable` includes `compositeParents` |
 | Blueprint | `bpx blueprint info <file.uasset> [--export <n>]` | ✅ Implemented | Function/blueprint summary |
+| Blueprint | `bpx blueprint anim-info <file.uasset> [--include-properties]` | ✅ Implemented | AnimBlueprint-focused summary of animation graphs, state machines, transitions, generated anim structs, and CDO anim nodes |
 | Blueprint | `bpx blueprint bytecode <file.uasset> --export <n> [--range-source auto\|export-map\|ustruct-script\|serial-full] [--strict-range] [--diagnostics]` | ✅ Implemented | Raw bytecode (base64) |
 | Blueprint | `bpx blueprint disasm <file.uasset> --export <n> [--format json\|toml\|text] [--analysis] [--entrypoint <vm>] [--max-steps <n>] [--range-source auto\|export-map\|ustruct-script\|serial-full] [--strict-range] [--diagnostics]` | ✅ Implemented | `--analysis` adds inference metadata; for large blueprints, narrow with `export list --class Function` first |
 | Blueprint | `bpx blueprint trace <file.uasset> --from <Node\|Node.Pin> [--to-node <token>] [--to-function <token>] [--max-depth <n>]` | ✅ Implemented | Returns shortest exec-link route across K2 nodes |
@@ -52,10 +53,12 @@ These are read/validate commands (implemented plus planned additions).
 | Struct | `bpx struct definition <file.uasset>` | ✅ Implemented | UDS definition read |
 | StringTable | `bpx stringtable read <file.uasset>` | ✅ Implemented | String table KV read |
 | Class | `bpx class <file.uasset> --export <n>` | ✅ Implemented | ClassExport read |
+| ControlRig | `bpx controlrig read <file.uasset> [--include-properties]` | ✅ Implemented | Summarizes ControlRig blueprint, graphs, RigVM model references, and graph-node counts |
 | Level | `bpx level info <file.umap> --export <n>` | ✅ Implemented | LevelExport read |
 | Level | `bpx level actor-search <file.umap> [--name <token>] [--actor-label <token>] [--actor-class <token>] [--limit <n>]` | ✅ Implemented | Searches `PersistentLevel` child exports by actor name/label/class tokens |
 | Level | `bpx level var-list <file.umap> --actor <name\|PersistentLevel.Name\|export-index>` | ✅ Implemented | Resolves placed objects via `OuterIndex -> PersistentLevel` and returns decoded variables |
 | Material | `bpx material read <file.uasset> [--export <n>] [--include-hlsl] [--children-root <directory>] [--parent <token>] [--pattern "*.uasset"] [--recursive] [--limit <n>]` | ✅ Implemented | Unified material read entry (inputs/refs/parent + optional children scan + HLSL summary) |
+| Niagara | `bpx niagara read <file.uasset> [--export <n>] [--include-properties]` | ✅ Implemented | Summarizes Niagara system composition, emitters, scripts, graphs, renderers, and data interfaces |
 | Raw Export | `bpx raw <file.uasset> --export <n>` | ✅ Implemented | Raw payload base64 |
 | Metadata | `bpx metadata <file.uasset> --export <n>` | ✅ Implemented | MetaDataExport read |
 | Struct Export | `bpx struct details <file.uasset> --export <n>` | ✅ Implemented | StructExport details |
