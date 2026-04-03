@@ -1605,6 +1605,13 @@ func (a *Asset) decodeKnownStructFromReader(r *byteReader, structType string) (a
 	case "softobjectpath", "softclasspath":
 		return a.decodeSoftObjectPathFromReader(r)
 	case "gameplaytag":
+		start := r.offset()
+		if decoded, ok := a.decodeTaggedStructFromReader(r, normalized); ok {
+			if tagName, ok := extractGameplayTagNameFromDecodedTaggedStruct(decoded); ok {
+				return tagName, true
+			}
+		}
+		_ = r.seek(start)
 		v, ok := a.decodeNameRefFromReader(r)
 		if !ok {
 			return nil, false
@@ -1937,6 +1944,11 @@ func (a *Asset) decodeKnownStructFromBytes(structType string, raw []byte) (any, 
 		r := a.newAssetReader(raw)
 		return a.decodeSoftObjectPathFromReader(r)
 	case "gameplaytag":
+		if decoded, _, ok := a.decodeTaggedStructFromBytes(raw, normalized); ok {
+			if tagName, ok := extractGameplayTagNameFromDecodedTaggedStruct(decoded); ok {
+				return tagName, true
+			}
+		}
 		r := a.newAssetReader(raw)
 		v, ok := a.decodeNameRefFromReader(r)
 		if !ok {
@@ -2313,6 +2325,40 @@ func encodePropertyTypeNodesForJSON(nodes []PropertyTypeNode, names []NameEntry)
 		})
 	}
 	return out
+}
+
+func extractGameplayTagNameFromDecodedTaggedStruct(decoded any) (string, bool) {
+	root, ok := decoded.(map[string]any)
+	if !ok {
+		return "", false
+	}
+	fields, ok := root["value"].(map[string]any)
+	if !ok {
+		return "", false
+	}
+	tagField, ok := fields["TagName"].(map[string]any)
+	if !ok {
+		return "", false
+	}
+	rawValue, ok := tagField["value"]
+	if !ok {
+		return "", false
+	}
+	switch t := rawValue.(type) {
+	case map[string]any:
+		name, _ := t["name"].(string)
+		if strings.TrimSpace(name) == "" || strings.EqualFold(name, "TagName") {
+			return "", false
+		}
+		return name, true
+	case string:
+		if strings.TrimSpace(t) == "" || strings.EqualFold(t, "TagName") {
+			return "", false
+		}
+		return t, true
+	default:
+		return "", false
+	}
 }
 
 func (a *Asset) decodePerQualityLevelStructFromReader(r *byteReader, structType string, valueIsFloat bool) (any, bool) {
